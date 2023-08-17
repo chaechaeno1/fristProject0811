@@ -75,7 +75,7 @@ public class TicketingService {
 			int sec = 1;
 			for (Map<String, Object> item : list) {
 
-				System.out.printf("%2d : %s25\n", sec, item.get("ST_NAME"));
+				System.out.printf("%2d : %15s\n", sec, item.get("ST_NAME"));
 				sec++;
 			}
 			System.out.println("-----------------------------");
@@ -110,20 +110,21 @@ public class TicketingService {
 			return View.TICKET_SEARCHING_STATION;
 		} else {
 			System.out.println("-----------------------------");
-			System.out.println(" \t  노선   \t\t  시간   \t  버스번호 \t\t등급");
+			System.out.println(" \t    노선 \t\t  시간   \t\t  버스번호 \t\t등급");
 			int sec = 1;
 
 			for (Map<String, Object> item : list) {
 
-				System.out.print(sec + " : \t" + item.get("RT_NAME"));
-				System.out.print(" \t" + item.get("SV_DATE"));
-				System.out.print(" \t" + item.get("BUS_NUM") + " \t");
+				System.out.printf("%2d : %12s " ,sec, item.get("RT_NAME"));
+				String str = String.valueOf(item.get("SV_DATE"));
+				System.out.print("\t" + str.substring(0, 13));
+				System.out.printf("\t%9s\t" , item.get("BUS_NUM"));
 				if (item.get("BUS_GRADE").equals("p"))
 					System.out.println("프리미엄");
 				else if (item.get("BUS_NUM").equals("u"))
-					System.out.println("  우등");
+					System.out.println("우등");
 				else
-					System.out.println("  일반");
+					System.out.println("일반");
 
 				sec++;
 			}
@@ -172,7 +173,6 @@ public class TicketingService {
 			for (Map<String, Object> item : list) {
 				int set = Integer.parseInt(String.valueOf(item.get("TK_SNUM")));
 				seat[set] = false;
-				System.out.println(set);
 			}
 		}
 
@@ -207,9 +207,9 @@ public class TicketingService {
 				seat[selectSeat] = false;
 
 				System.out.println(selectSeat + "번 좌석이 성공적으로 추가되었습니다.");
-
+				System.out.println("선택한 좌석 : ");
 				for (Object item : seatStack)
-					System.out.println(item);
+					System.out.println(item + "번 ");
 
 				System.out.print("추가로 선택하시겠습니까? (y/n) : ");
 
@@ -224,7 +224,8 @@ public class TicketingService {
 				} else {
 					System.out.println("잘못 입력하셨습니다. ");
 				}
-			}
+			} else
+				System.out.println("이미 선택된 좌석입니다.");
 		}
 	}
 
@@ -278,15 +279,15 @@ public class TicketingService {
 		System.out.println("총 결재금액 : " + totalPrice);
 		int totalPriceTemp = totalPrice;
 		while(true) {
-			System.out.println("결제할 금액 입력 >> ");
+			System.out.print("결제할 금액 입력 >> ");
 			int cstPayment = ScanUtil.nextInt();
-			if(cstPayment > totalPriceTemp) {
+			if(cstPayment >= totalPriceTemp) {
 				totalPriceTemp -= cstPayment;
-				System.out.println("거스름돈 : " + totalPrice);
+				System.out.println("거스름돈 : " + totalPriceTemp);
 				break;
 			} else {
 				totalPriceTemp -= cstPayment;
-				System.out.println("추가로 결제할 금액 : " + totalPrice);
+				System.out.println("추가로 결제할 금액 : " + totalPriceTemp);
 			}
 		}
 		List<Object> billParam = new ArrayList<>();
@@ -348,17 +349,18 @@ public class TicketingService {
 			System.out.println("티켓이 없습니다.");
 		} else {
 
-			System.out.println("번호 \t 노선 \t 출발시간 \t\t\t \t버스번호 \t\t 좌석번호 \t\t나이구분 \t\t구매일자 \t\t 버스등급 ");
+			System.out.println("번호 \t 노선 \t 출발시간 \t \t버스번호 \t 좌석번호 \t나이구분 \t구매일자 \t 버스등급 ");
 			System.out.println("----------------------------------------------------------");
 			int sec = 1;
 			for (Map<String, Object> item : list) {
 
-				System.out.print(sec + " : \t" + item.get("RT_NAME"));
-				System.out.print(" : \t" + item.get("SV_DATE"));
-				System.out.print(" : \t" + item.get("BUS_NUM"));
-				System.out.print(" \t" + item.get("TK_SNUM"));
-				System.out.print(" \t" + item.get("AGE_DIV"));
-				System.out.print(" \t " + item.get("RES_DATE"));
+				System.out.printf(" %2d : %15s\t" ,sec , item.get("RT_NAME"));
+				String str = String.valueOf(item.get("SV_DATE"));
+				System.out.print(" \t" + str.substring(0, 13));
+				System.out.printf(" \t%10s" , item.get("BUS_NUM"));
+				System.out.printf(" \t" + item.get("TK_SNUM"));
+				System.out.printf(" \t%5s" , item.get("AGE_DIV"));
+				System.out.printf(" \t " + item.get("RES_DATE"));
 				if (item.get("BUS_GRADE").equals("p"))
 					System.out.println(" \t " + "프리미엄");
 				else if (item.get("BUS_NUM").equals("u"))

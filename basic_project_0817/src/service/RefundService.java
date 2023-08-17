@@ -68,7 +68,7 @@ public class RefundService {
 		}
 
 		System.out.println("되돌아가기 : 0");
-		System.out.println("환불할 티켓의 번호를 입력하세요 >>");
+		System.out.print("환불할 티켓의 번호를 입력하세요 >>");
 
 		int st = ScanUtil.nextInt();
 
