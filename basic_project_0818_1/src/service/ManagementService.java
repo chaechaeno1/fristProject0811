@@ -40,7 +40,7 @@ public class ManagementService {
 
 			Map<String, Object> admin = dao.adminlist();
 
-			if(admin.get("AD_ID").equals(adIdInput) && admin.get("AD_PW").equals(adPwInput)) {
+			if (admin.get("AD_ID").equals(adIdInput) && admin.get("AD_PW").equals(adPwInput)) {
 				Controller.sessionStorage.put("login", true);
 				Controller.sessionStorage.put("loginInfo", admin.get("AD_ID"));
 				return View.MANAGE_MENU; // 로그인 성공 시 메소드 종료
@@ -129,7 +129,7 @@ public class ManagementService {
 
 		int sec = 1;
 		for (Map<String, Object> item : routelist) {
-			System.out.printf("%2d  : %8s\t" , sec, item.get("RT_ID"));
+			System.out.printf("%2d  : %8s\t", sec, item.get("RT_ID"));
 			System.out.printf("%10s\t", item.get("RT_NAME"));
 			System.out.printf("%10s\t", String.valueOf(item.get("RT_PRICE")));
 			System.out.printf("%4s", String.valueOf(item.get("RT_PNUM")));
@@ -149,7 +149,7 @@ public class ManagementService {
 			System.out.print("노선 선택 >> ");
 			rtIdInput = ScanUtil.nextInt();
 
-			if(rtIdInput == 0)
+			if (rtIdInput == 0)
 				return View.MANAGE_MENU;
 			if (routelist.size() < rtIdInput || rtIdInput <= 0) {
 				System.out.println("노선 입력오류!!\n리스트에 있는 노선ID를 확인해주시기 바랍니다.");
@@ -217,7 +217,7 @@ public class ManagementService {
 		System.out.println("==============================================================================");
 
 		System.out.println();
-		
+
 		System.out.println("==============================================================================");
 		System.out.println("번호\t버스ID\t차량번호\t버스등급");
 		System.out.println("==============================================================================");
@@ -225,7 +225,7 @@ public class ManagementService {
 		List<Map<String, Object>> buslist = dao.buslist();
 		sec = 1;
 		for (Map<String, Object> item : buslist) {
-			System.out.printf("%2d : %6s " , sec, item.get("BUS_ID"));
+			System.out.printf("%2d : %6s ", sec, item.get("BUS_ID"));
 			System.out.printf("%10s \t", String.valueOf(item.get("BUS_NUM")));
 			if (item.get("BUS_GRADE").equals("p"))
 				System.out.print("프리미엄");
@@ -233,7 +233,7 @@ public class ManagementService {
 				System.out.print("우등");
 			else
 				System.out.print("일반");
-			
+
 			System.out.println();
 			sec++;
 		}
@@ -294,9 +294,9 @@ public class ManagementService {
 			System.out.println("==============================================================================");
 			System.out.println("\t운행ID\t\t\t운행일시\t  노선ID\t\t버스ID");
 			System.out.println("==============================================================================");
-			
-			SimpleDateFormat sdf = new SimpleDateFormat ("yy년 MM월 dd일 kk:mm");
-			
+
+			SimpleDateFormat sdf = new SimpleDateFormat("yy년 MM월 dd일 kk:mm");
+
 			for (Map<String, Object> item : servicelist) {
 				System.out.printf("%2d : %16s", sec, item.get("SV_ID"));
 				String str = String.valueOf(item.get("SV_DATE"));
@@ -314,26 +314,40 @@ public class ManagementService {
 			int svIdInput;
 
 			while (true) {
+				System.out.println("되돌아가기 : 0");
 				System.out.print("운행번호 입력 >> ");
 				svIdInput = ScanUtil.nextInt();
+
+				if (svIdInput == 0) {
+					System.out.print("되돌아 갑니다.");
+					return View.MANAGE_ROUTE;
+				}
 
 				if (servicelist.size() < svIdInput || svIdInput <= 0) {
 					System.out.println("운행번호 입력오류!!\n리스트에 있는 운행번호를 확인해주시기 바랍니다.");
 					System.out
 							.println("==============================================================================");
 				} else {
-					System.out.print("삭제할 운행번호 >> " + servicelist.get(svIdInput - 1).get("SV_ID"));
+					System.out.println("삭제할 운행번호 >> " + servicelist.get(svIdInput - 1).get("SV_ID"));
 					param.add(servicelist.get(svIdInput - 1).get("SV_ID"));
 					break;
 				}
 			}
 
-			int flag = dao.ServiceDelete(param);
-			if (flag != 0)
-				System.out.println("운행 노선 삭제가 완료되었습니다.");
-			else
-				System.out.println("운행 노선 삭제에 실패하였습니다...");
+			System.out.print("정말 삭제 하시겠습니까? (y/n) >>");
+			String yn = ScanUtil.nextLine();
 
+			if (yn.equals("n")) {
+				System.out.print("되돌아 갑니다.");
+				return View.MANAGE_ROUTE;
+			} else if (yn.equals("y")) {
+				int flag = dao.ServiceDelete(param);
+				if (flag != 0)
+					System.out.println("운행 노선 삭제가 완료되었습니다.");
+				else
+					System.out.println("운행 노선 삭제에 실패하였습니다...");
+			} else
+				return View.MANAGE_ROUTE;
 			return View.MANAGE_MENU;
 		}
 
@@ -348,7 +362,8 @@ public class ManagementService {
 		System.out.print(">>메뉴 번호 입력 : ");
 		int SelectMenu = ScanUtil.nextInt();
 
-		if (SelectMenu == 1) { // 버스추가
+		if (SelectMenu == 1) {
+			// 버스추가
 
 			System.out.print("차량번호 입력 >> ");
 			String busnum = ScanUtil.nextLine();
@@ -377,25 +392,29 @@ public class ManagementService {
 			} else {
 				System.out.println("버스 추가에 실패하였습니다...");
 			}
-		} else if (SelectMenu == 2) { // 버스삭제
+		} else if (SelectMenu == 2) {
+			// 버스삭제
+
 			List<Map<String, Object>> busList = dao.buslist();
 
 			if (busList == null) {
 				System.out.println("삭제할 버스가 없습니다.");
 				return View.MANAGE_MENU;
 			}
-
+			
+			System.out.println("==============================================================================");
+			System.out.println("번호   버스ID \t 차량번호 \t등급");
+			System.out.println("==============================================================================");
 			int sec = 1;
 			for (Map<String, Object> item : busList) {
-
-				System.out.print(sec + " : \t" + item.get("BUS_ID"));
-				System.out.print("\t\t" + item.get("BUS_NUM") + "\t\t");
+				System.out.printf("%2d : %6s ", sec, item.get("BUS_ID"));
+				System.out.printf("%10s \t", String.valueOf(item.get("BUS_NUM")));
 				if (item.get("BUS_GRADE").equals("p"))
 					System.out.print("프리미엄");
 				else if (item.get("BUS_GRADE").equals("u"))
-					System.out.print("  우등");
+					System.out.print("우등");
 				else
-					System.out.print("  일반");
+					System.out.print("일반");
 				sec++;
 				System.out.println();
 			}
@@ -409,34 +428,47 @@ public class ManagementService {
 				return View.MANAGE_BUS;
 			}
 
-			List<Object> param = new ArrayList<>();
-			param.add(busList.get(selectbus - 1).get("BUS_ID"));
+			System.out.println("정말 삭제하시겠습니까? (y/n) >>");
+			String yn = ScanUtil.nextLine();
 
-			int flag = dao.busDelete(param);
-			if (flag == 0)
-				System.out.println("버스 삭제에 실패하였습니다...");
-			else
-				System.out.println("버스 삭제에 성공하였습니다.");
+			if (yn.equals("n"))
+				System.out.println("되돌아 갑니다.");
+			else if (yn.equals("y")) {
+				List<Object> param = new ArrayList<>();
+				param.add(busList.get(selectbus - 1).get("BUS_ID"));
 
-		} else if (SelectMenu == 9) { // 버스목록
+				int flag = dao.busDelete(param);
+				if (flag == 0)
+					System.out.println("버스 삭제에 실패하였습니다...");
+				else
+					System.out.println("버스 삭제에 성공하였습니다.");
+			} else
+				System.out.println("잘못 입력 하셨습니다.");
+
+		} else if (SelectMenu == 9) {
+			// 버스목록
+
 			List<Map<String, Object>> busList = dao.buslist();
 
 			if (busList == null) {
 				System.out.println("버스 목록이 없습니다.");
 				return View.MANAGE_MENU;
 			}
+			
+			System.out.println("==============================================================================");
+			System.out.println("번호   버스ID \t 차량번호 \t등급");
+			System.out.println("==============================================================================");
 
 			int sec = 1;
 			for (Map<String, Object> item : busList) {
-
-				System.out.print(sec + " : \t" + item.get("BUS_ID"));
-				System.out.print("\t\t" + item.get("BUS_NUM") + "\t\t");
+				System.out.printf("%2d : %6s ", sec, item.get("BUS_ID"));
+				System.out.printf("%10s \t", String.valueOf(item.get("BUS_NUM")));
 				if (item.get("BUS_GRADE").equals("p"))
 					System.out.print("프리미엄");
 				else if (item.get("BUS_GRADE").equals("u"))
-					System.out.print("  우등");
+					System.out.print("우등");
 				else
-					System.out.print("  일반");
+					System.out.print("일반");
 				sec++;
 				System.out.println();
 			}
@@ -456,6 +488,7 @@ public class ManagementService {
 		int SelectMenu = ScanUtil.nextInt();
 
 		if (SelectMenu == 1) {
+			// 터미널 추가
 
 			System.out.print("터미널이름 >> ");
 			String stsName = ScanUtil.nextLine();
@@ -478,25 +511,38 @@ public class ManagementService {
 				System.out.println("터미널 추가실패!");
 			}
 		} else if (SelectMenu == 2) {
+			// 터미널 삭제
+
 			List<Map<String, Object>> stsList = dao.Stationlist();
 
 			if (stsList == null) {
 				System.out.println("삭제할 터미널이 없습니다.");
 				return View.MANAGE_MENU;
 			}
-
+			
+			System.out.println("==============================================================================");
+			System.out.println("번호   \t터미널 이름 \t 주소");
+			System.out.println("==============================================================================");
+		
 			int sec = 1;
 			for (Map<String, Object> item : stsList) {
 
-				System.out.printf("%2d : %8s\n", sec, item.get("ST_NAME"));
-				System.out.print("\t" + item.get("ST_LOC") + "\t");
+				System.out.printf("%2d : %8s", sec, item.get("ST_NAME"));
+				System.out.print("\t\t" + item.get("ST_LOC") + "\t");
 
 				sec++;
 				System.out.println();
 			}
 
+			System.out.println("되돌아가기 : 0");
 			System.out.print("삭제할 터미널을 입력 : ");
 			int selectSation = ScanUtil.nextInt();
+
+			if (selectSation == 0) {
+				System.out.println("되돌아 갑니다.");
+				return View.MANAGE_STATION;
+			}
+
 			System.out.println("size : " + selectSation + " " + stsList.size());
 
 			if (stsList.size() < selectSation || selectSation <= 0) {
@@ -507,22 +553,38 @@ public class ManagementService {
 			List<Object> param = new ArrayList<>();
 			param.add(stsList.get(selectSation - 1).get("ST_ID"));
 
-			System.out.println("param : " + param);
+			System.out.println("정말 삭제하시겠습니까? (y/n) >>");
+			String yn = ScanUtil.nextLine();
 
-			int flag = dao.stationDelete(param);
+			if (yn.equals("n")) {
+				System.out.println("되돌아 갑니다.");
+				return View.MANAGE_STATION;
+			} else if (yn.equals("y")) {
 
-			if (flag == 0)
-				System.out.println("터미널 삭제 실패");
-			else
-				System.out.println("터미널 삭제 성공");
+				int flag = dao.stationDelete(param);
+
+				if (flag == 0)
+					System.out.println("터미널 삭제 실패");
+				else
+					System.out.println("터미널 삭제 성공");
+			} else {
+				System.out.println("잘못 입력 하셨습니다.");
+				return View.MANAGE_STATION;
+			}
 
 		} else if (SelectMenu == 9) {
+			// 터미널 목록
+
 			List<Map<String, Object>> stsList = dao.Stationlist();
 
 			if (stsList == null) {
 				System.out.println("터미널 목록이 없습니다.");
 				return View.MANAGE_MENU;
 			}
+			
+			System.out.println("==============================================================================");
+			System.out.println("번호   \t터미널 이름 \t 주소");
+			System.out.println("==============================================================================");
 
 			int sec = 1;
 			for (Map<String, Object> item : stsList) {
@@ -563,9 +625,8 @@ public class ManagementService {
 			}
 			int sec = 1;
 			for (Map<String, Object> item : stsList) {
-
-				System.out.print(sec + " : \t" + item.get("ST_NAME"));
-				System.out.print("\t\t" + item.get("ST_LOC") + "\t\t");
+				System.out.printf("%2d : %15s", sec, item.get("ST_NAME"));
+				System.out.print("\t" + item.get("ST_LOC") + "\t");
 
 				sec++;
 				System.out.println();
@@ -636,17 +697,22 @@ public class ManagementService {
 
 			if (rtList == null) {
 				System.out.println("삭제할 노선이 없습니다.");
-				return View.MANAGE_MENU;
+				return View.MANAGE_ROUTE;
 			}
 
+			System.out.println("==============================================================================");
+			System.out.println("번호         노선ID\t 노선 이름 \t\t 기준가격 \t\t 플랫폼 \t 운행시간 ");
+			System.out.println("==============================================================================");
+			
 			int sec = 1;
 			for (Map<String, Object> item : rtList) {
-
-				System.out.print(sec + " : \t" + item.get("RT_NAME"));
-				System.out.print("\t\t" + item.get("RT_PNUM") + "\t\t");
-				System.out.print("\t\t" + item.get("RT_PRICE") + "\t\t");
-				sec++;
+				System.out.printf("%2d  : %8s\t", sec, item.get("RT_ID"));
+				System.out.printf("%10s\t", item.get("RT_NAME"));
+				System.out.printf("%10s\t", String.valueOf(item.get("RT_PRICE")));
+				System.out.printf("%4s", String.valueOf(item.get("RT_PNUM")));
+				System.out.printf("%6s", String.valueOf(item.get("RT_TIME")));
 				System.out.println();
+				sec++;
 			}
 
 			System.out.print("삭제할 노선을 입력 : ");
@@ -660,31 +726,47 @@ public class ManagementService {
 			List<Object> param = new ArrayList<>();
 			param.add(rtList.get(selectSation - 1).get("RT_ID"));
 
-			int flag = dao.routeDelete(param);
-			if (flag == 0)
-				System.out.println("노선 삭제 실패");
-			else
-				System.out.println("노선 삭제 성공");
+			System.out.println("정말 삭제하시겠습니까? (y/n) >>");
+			String yn = ScanUtil.nextLine();
 
+			if (yn.equals("n"))
+				System.out.println("되돌아 갑니다.");
+			else if (yn.equals("y")) {
+				int flag = dao.routeDelete(param);
+				if (flag == 0)
+					System.out.println("노선 삭제 실패");
+				else
+					System.out.println("노선 삭제 성공");
+			} else
+			System.out.println("잘못 입력 하셨습니다.");
+			
+			
 		} else if (SelectMenu == 9) {
+			//노선 목록
+			
 			List<Map<String, Object>> rtList = dao.route();
 
 			if (rtList == null) {
 				System.out.println("노선 목록이 없습니다.");
-				return View.MANAGE_MENU;
+				return View.MANAGE_ROUTE;
 			}
+			
+			System.out.println("==============================================================================");
+			System.out.println("번호         노선ID\t 노선 이름 \t\t 기준가격 \t\t 플랫폼 \t 운행시간 ");
+			System.out.println("==============================================================================");
 
 			int sec = 1;
 			for (Map<String, Object> item : rtList) {
-
-				System.out.print(sec + " : \t" + item.get("RT_NAME"));
-				System.out.print("\t\t" + item.get("RT_PNUM") + "\t\t");
-				System.out.print("\t\t" + item.get("RT_PRICE") + "\t\t");
-				sec++;
+				System.out.printf("%2d  : %8s\t", sec, item.get("RT_ID"));
+				System.out.printf("%10s\t", item.get("RT_NAME"));
+				System.out.printf("%10s\t", String.valueOf(item.get("RT_PRICE")));
+				System.out.printf("%4s", String.valueOf(item.get("RT_PNUM")));
+				System.out.printf("%6s", String.valueOf(item.get("RT_TIME")));
 				System.out.println();
+				sec++;
 			}
 		} else if (SelectMenu == 0)
-			return View.HOME;
+			return View.MANAGE_MENU;
 		return View.MANAGE_ROUTE;
 
 	}
@@ -698,14 +780,15 @@ public class ManagementService {
 
 		} else {
 			System.out.println("==============================================================================");
-			System.out.println("\t운행ID\t\t\t운행일시\t\t\t\t노선ID\t\t버스ID");
+			System.out.println("번호         노선ID      노선명                   비용                   승차홈     소요시간");
 			System.out.println("==============================================================================");
 
 			for (Map<String, Object> item : servicelist) {
-				System.out.print(sec + " :    " + item.get("SV_ID"));
-				System.out.print("\t\t" + item.get("SV_DATE"));
-				System.out.print("\t\t" + item.get("RT_ID"));
-				System.out.print("\t\t" + item.get("BUS_ID"));
+				System.out.printf("%2d : %16s", sec, item.get("SV_ID"));
+				String str = String.valueOf(item.get("SV_DATE"));
+				System.out.printf("\t%15s", str.substring(2, 16));
+				System.out.printf("\t%8s", item.get("RT_ID"));
+				System.out.printf("\t%8s", item.get("BUS_ID"));
 				System.out.println();
 				sec++;
 			}
