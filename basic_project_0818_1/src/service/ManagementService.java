@@ -43,7 +43,7 @@ public class ManagementService {
 			if (admin.get("AD_ID").equals(adIdInput) && admin.get("AD_PW").equals(adPwInput)) {
 				Controller.sessionStorage.put("login", true);
 				Controller.sessionStorage.put("loginInfo", admin.get("AD_ID"));
-				return View.MANAGE_MENU; // 로그인 성공 시 메소드 종료
+				return View.MANAGE_MENU; // 로그인 성공 시 메소드 종료.
 			} else {
 				System.out.println("잘못된 아이디/비밀번호입니다. 다시 입력해주세요.");
 				System.out.println("==============================================================================");
