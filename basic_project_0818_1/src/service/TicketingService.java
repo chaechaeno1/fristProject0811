@@ -157,7 +157,7 @@ public class TicketingService {
 			ticketStorage.put("bus", list.get(st - 1).get("BUS_ID"));
 			ticketStorage.put("grade", list.get(st - 1).get("BUS_GRADE"));
 			ticketStorage.put("price", Integer.parseInt(String.valueOf(list.get(st - 1).get("RT_PRICE"))));
-			return View.TICKET;
+			return View.TICKET_SEARCHING_BUS_SEAT;
 		} catch (Exception e) {
 			System.out.println("잘못 입력하셨습니다.");
 			return View.TICKET;
